@@ -368,6 +368,13 @@ main{--pad:13px}
   <section class="view" id="view-tambah">
     <div class="panel">
       <h3 id="formTitle" style="margin-bottom:14px">Tambah Prospek</h3>
+      <details class="waBox" id="waBox" style="margin-bottom:14px;border:1px dashed #d6dde7;border-radius:12px;padding:12px;background:#fafbfd">
+        <summary style="font-weight:700;cursor:pointer">💬 Isi otomatis dari chat WhatsApp</summary>
+        <div class="hint" style="margin:8px 0">Di WhatsApp: buka chat konsumen, salin percakapan (atau Ekspor chat), lalu tempel di bawah. Nama, nomor, unit, cash/kredit, DP, tenor, dan ringkasan akan terisi. Periksa dulu sebelum menyimpan.</div>
+        <textarea id="waPaste" placeholder="Tempel percakapan WhatsApp di sini…" style="min-height:120px"></textarea>
+        <div class="formActions" style="margin-top:10px"><button class="btn" id="waRead" type="button">Baca Chat &amp; Isi Form</button><button class="btn secondary" id="waClear" type="button">Kosongkan</button></div>
+        <div class="hint" id="waResult" style="margin-top:8px"></div>
+      </details>
       <form id="leadForm" novalidate>
         <input type="hidden" id="editId">
         <div class="formGrid">
@@ -1035,6 +1042,140 @@ sb.auth.onAuthStateChange((ev,s)=>{setTimeout(()=>{
     if(last&&last.id&&!navigator.onLine)bootOffline(last);else showAuth();
   }
 },0)});
+
+/* ---------- isi otomatis dari chat WhatsApp ---------- */
+const WA_FAM=['revo','supra','beat','genio','scoopy','verza','vario','gtr','icon','sonic','stylo','cb150x','cb150r','pcx','adv','crf','cbr','em1','cuv','super cub','st125','ct125','monkey','forza'];
+function waNorm(s){return String(s||'').toLowerCase().replace(/honda/g,' ').replace(/[^a-z0-9]+/g,' ').trim()}
+function waPhone(s){
+  const m=String(s||'').match(/(?:\+?62|0)[\s.\-]?8[\d\s.\-]{7,13}\d/);if(!m)return'';
+  let d=m[0].replace(/\D/g,'');if(d.startsWith('62'))d='0'+d.slice(2);
+  return d.length>=10&&d.length<=14?d:'';
+}
+function waMoney(txt,key){
+  const re=new RegExp(key+'\\s*(?:sekitar|kira[- ]?kira|maks(?:imal)?|di ?kisaran|nya|:|=|rp\\.?)?\\s*([0-9][0-9.,]*)\\s*(juta|jt|rb|ribu|k)?','gi');
+  let m,best=0;
+  while((m=re.exec(txt))){
+    let raw=m[1],u=(m[2]||'').toLowerCase(),v;
+    if(u==='juta'||u==='jt'){v=parseFloat(raw.replace(/\./g,'').replace(',','.'))*1e6;if(/^\d{1,3}(\.\d{3})+$/.test(raw))v=parseFloat(raw.replace(/\./g,''))}
+    else if(u==='rb'||u==='ribu'||u==='k'){v=parseFloat(raw.replace(/\./g,'').replace(',','.'))*1e3}
+    else{v=parseFloat(raw.replace(/[.,]/g,''))}
+    if(v>=100000&&v<=100000000)best=Math.round(v);
+  }
+  return best;
+}
+function waUnit(txt){
+  const t=' '+waNorm(txt)+' ';let best=-1,bl=0;
+  UNITS.forEach((u,i)=>{const n=waNorm(u.n);if(n&&t.includes(' '+n+' ')&&n.length>bl){best=i;bl=n.length}});
+  if(best>=0)return best;
+  // sebut tipe saja, mis. "vario 160" atau "beat": ambil varian pertama
+  const toks=t.trim().split(' ');
+  for(let k=0;k<toks.length;k++){
+    for(const len of [2,1]){
+      const frag=toks.slice(k,k+len).join(' ');if(!frag)continue;
+      if(!WA_FAM.some(f=>frag.startsWith(f.split(' ')[0]))&&!/^(cb150|cb 150)/.test(frag))continue;
+      const i=UNITS.findIndex(u=>waNorm(u.n).startsWith(frag));if(i>=0&&frag.length>=3)return i;
+    }
+  }
+  return -1;
+}
+function waDays(txt,base){
+  const t=txt.toLowerCase();const d=new Date(base);const out=n=>{const x=new Date(base);x.setDate(x.getDate()+n);return x};
+  const fmt=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+  if(/\bbesok\b/.test(t))return fmt(out(1));
+  if(/\blusa\b/.test(t))return fmt(out(2));
+  if(/minggu depan|pekan depan/.test(t))return fmt(out(7));
+  const names=['minggu','senin','selasa','rabu','kamis','jumat',"jum'at",'sabtu'];
+  const idx={minggu:0,senin:1,selasa:2,rabu:3,kamis:4,jumat:5,"jum'at":5,sabtu:6};
+  const re=/\b(senin|selasa|rabu|kamis|jumat|jum'at|sabtu|minggu)\b/g;let m,last=null;
+  while((m=re.exec(t)))last=m[1];
+  if(last){let diff=(idx[last]-d.getDay()+7)%7;if(diff===0)diff=7;return fmt(out(diff))}
+  return '';
+}
+function waParse(raw,meNama){
+  const text=String(raw||'').replace(/\u200e|\u202f/g,' ');
+  const lines=text.split(/\r?\n/);
+  const hdr=/^\s*\[?(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})[,\s]+(?:pukul\s+)?(\d{1,2}[.:]\d{2})(?:[.:]\d{2})?\s*(?:[ap]\.?m\.?)?\]?\s*(?:-\s*)?([^:]{1,60}?):\s?(.*)$/i;
+  const hdr2=/^\s*\[(\d{1,2}[.:]\d{2})(?:[.:]\d{2})?,\s*(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})\]\s*([^:]{1,60}?):\s?(.*)$/i;
+  const msgs=[];
+  lines.forEach(l=>{
+    let m=l.match(hdr),from,body;
+    if(m){from=m[3].trim();body=m[4]}
+    else{m=l.match(hdr2);if(m){from=m[3].trim();body=m[4]}}
+    if(from!==undefined){msgs.push({from,body:body||''})}
+    else if(msgs.length&&l.trim())msgs[msgs.length-1].body+='\n'+l;
+  });
+  const meL=String(meNama||'').toLowerCase().split(/\s+/)[0];
+  const senders=[...new Set(msgs.map(m=>m.from))];
+  const isMe=s=>{const x=s.toLowerCase();return /^(anda|you|saya|aku)$/.test(x)||(meL&&x.includes(meL))||/sps|honda|sales|dealer/.test(x)};
+  const cust=senders.filter(s=>!isMe(s));
+  const custName=cust[0]||'';
+  const custMsgs=msgs.filter(m=>m.from===custName).map(m=>m.body.trim()).filter(Boolean);
+  const all=msgs.length?msgs.map(m=>m.body).join('\n'):text;
+  const custText=msgs.length?(custMsgs.join('\n')||all):text;
+  let wa='',nama='';
+  if(custName){if(waPhone(custName))wa=waPhone(custName);else if(!/^\+?[\d\s\-]+$/.test(custName))nama=custName}
+  if(!wa)wa=waPhone(custText)||waPhone(all);
+  if(!nama){
+    const m=custText.match(/(?:nama (?:saya|aku|lengkap)?\s*(?:adalah|:)?|atas nama|perkenalkan,? (?:saya)?|saya)\s+([A-Za-z]+(?:\s+[A-Za-z]+){0,2})/i);
+    if(m){const cand=m[1].replace(/\b(mau|ingin|tanya|nanya|pak|bu|dari|di|yang|lagi|butuh|cari|pengen|minat|ada|apakah|ke|sabtu|minggu|senin|selasa|rabu|kamis|jumat|besok|lusa|nanti|akan|tertarik|sedang|punya)\b.*$/i,'').trim();if(cand.length>=3)nama=cand.replace(/\b\w/g,c=>c.toUpperCase())}
+  }
+  const ui=waUnit(custText)>=0?waUnit(custText):waUnit(all);
+  const t=(custText+'\n'+all).toLowerCase();
+  let kredit=(t.match(/kredit|cicil|angsur|leasing|tenor|\bdp\b|uang muka/g)||[]).length;
+  let cash=(t.match(/\bcash\b|tunai|lunas|\bcsh\b/g)||[]).length;
+  const bayar=kredit===0&&cash===0?'':(kredit>=cash?'Kredit':'Cash');
+  const dp=bayar==='Kredit'?(waMoney(custText,'(?:dp|uang muka|budget dp)')||waMoney(all,'(?:dp|uang muka)')):0;
+  let tenor='';
+  const tm=t.match(/tenor\s*(\d{1,2})|(\d{1,2})\s*(?:bulan|bln|x\b)|(\d)\s*(?:tahun|thn)/);
+  if(tm){tenor=tm[1]?+tm[1]:tm[2]?+tm[2]:+tm[3]*12}
+  const angs=bayar==='Kredit'?waMoney(custText,'(?:angsuran|cicilan)'):0;
+  let warna='';
+  if(ui>=0){const c=UNITS[ui].c.find(x=>t.includes(String(x[0]).toLowerCase()));if(c)warna=c[0]}
+  let status='Baru';
+  if(ui>=0||dp||bayar)status='Tertarik';
+  if(/survey|survei|booking|\bambil\b|\bdeal\b|jadi beli|\bsiap\b.*(beli|ambil)/.test(t))status='Tertarik';
+  const next=waDays(msgs.length?msgs.slice(-6).map(m=>m.body).join('\n'):text,new Date());
+  // ringkasan
+  const bits=[];
+  if(ui>=0)bits.push('minat '+UNITS[ui].n+(warna?' warna '+warna:''));
+  if(bayar)bits.push(bayar.toLowerCase());
+  if(dp)bits.push('DP '+rp(dp));
+  if(tenor)bits.push('tenor '+tenor+' bln');
+  if(angs)bits.push('angsuran maks '+rp(angs));
+  const last=custMsgs.slice(-2).map(s=>s.replace(/\s+/g,' ').slice(0,110));
+  const note='Ringkasan chat WA: '+(bits.length?bits.join(', ')+'. ':'belum ada detail unit. ')+(last.length?'Pesan terakhir konsumen: "'+last.join(' / ')+'"':'');
+  return {nama,wa,unitIdx:ui,bayar,dp,tenor,warna,status,next,note,found:msgs.length>0};
+}
+
+$('waClear').onclick=()=>{$('waPaste').value='';$('waResult').innerHTML=''};
+$('waRead').onclick=()=>{
+  const raw=$('waPaste').value.trim();
+  if(!raw){toast('Tempel chat WhatsApp dulu');return}
+  const r=waParse(raw,me&&me.nama);
+  if(!$('editId').value)clearForm();
+  const got=[],miss=[];
+  if(r.nama){$('nama').value=r.nama;got.push('nama')}else miss.push('nama');
+  if(r.wa){$('wa').value=r.wa;got.push('no WA')}else miss.push('no WA');
+  $('sumber').value='WhatsApp';
+  if(r.unitIdx>=0){setMotor(UNITS[r.unitIdx].n);got.push('unit')}else miss.push('unit');
+  fillDeps(r.warna,r.tenor);
+  if(r.warna)got.push('warna');
+  if(r.bayar){$('bayar').value=r.bayar;got.push(r.bayar)}else miss.push('cash/kredit');
+  if(r.bayar==='Kredit'){if(r.dp){$('dp').value=r.dp;got.push('DP')}else miss.push('DP');if(r.tenor)got.push('tenor')}
+  updateEst();
+  $('status').value=r.status;
+  if(r.next){$('next').value=r.next;got.push('jadwal follow up')}
+  if(!$('sales').value&&me&&me.nama)$('sales').value=me.nama;
+  const old=$('catatan').value.trim();
+  $('catatan').value=old&&old!==r.note?old+'\n'+r.note:r.note;
+  const dup=r.wa?leads.find(x=>x.wa&&digits(x.wa)===digits(r.wa)&&x.id!==$('editId').value):null;
+  let msg='✅ Terisi: '+esc(got.join(', ')||'-')+'.'+(miss.length?'<br>❓ Belum ketemu: '+esc(miss.join(', '))+' (isi manual).':'');
+  if(!r.found)msg+='<br><small>Format chat tidak dikenali, jadi nama diambil dari kalimat. Periksa lagi.</small>';
+  if(dup)msg+='<br>⚠️ Nomor ini sudah ada di prospek atas nama <b>'+esc(dup.nama)+'</b>. Cek dulu supaya tidak dobel.';
+  msg+='<br>Periksa isian di bawah, lalu tekan <b>Simpan Prospek</b>.';
+  $('waResult').innerHTML=msg;
+  $('leadForm').scrollIntoView({behavior:'smooth',block:'start'});
+};
 
 /* ---------- mulai ---------- */
 clearForm();applyHero();render();updateSyncUI();

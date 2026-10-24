@@ -355,7 +355,7 @@ main{--pad:13px}
       <div class="toolbar">
         <div class="searchBox"><svg class="ic"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Cari nama, HP, atau motor" aria-label="Cari prospek"></div>
         <select id="filterStatus" aria-label="Filter status"><option value="">Semua Status</option><option>Baru</option><option>Follow-up</option><option>Tertarik</option><option>Closing</option><option>Gagal</option></select>
-        <select id="filterSource" aria-label="Filter sumber"><option value="">Semua Sumber</option><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Showroom</option><option>Lainnya</option></select>
+        <select id="filterSource" aria-label="Filter sumber"><option value="">Semua Sumber</option><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>Showroom</option><option>Canvasing</option><option>Flyering</option><option>Website</option><option>Event</option><option>Referensi</option><option>Lainnya</option></select>
         <select id="filterBayar" aria-label="Filter pembelian"><option value="">Cash &amp; Kredit</option><option>Cash</option><option>Kredit</option><option value="-">Belum ditentukan</option></select>
         <button class="btn secondary" id="exportBtn" type="button"><svg class="ic"><use href="#i-down"/></svg>Ekspor CSV</button>
       </div>
@@ -368,11 +368,13 @@ main{--pad:13px}
   <section class="view" id="view-tambah">
     <div class="panel">
       <h3 id="formTitle" style="margin-bottom:14px">Tambah Prospek</h3>
-      <details class="waBox" id="waBox" style="margin-bottom:14px;border:1px dashed #d6dde7;border-radius:12px;padding:12px;background:#fafbfd">
+      <details class="waBox" id="waBox" open style="margin-bottom:14px;border:1px dashed #d6dde7;border-radius:12px;padding:12px;background:#fafbfd">
         <summary style="font-weight:700;cursor:pointer">💬 Isi otomatis dari chat WhatsApp</summary>
-        <div class="hint" style="margin:8px 0">Di WhatsApp: buka chat konsumen, salin percakapan (atau Ekspor chat), lalu tempel di bawah. Nama, nomor, unit, cash/kredit, DP, tenor, dan ringkasan akan terisi. Periksa dulu sebelum menyimpan.</div>
-        <textarea id="waPaste" placeholder="Tempel percakapan WhatsApp di sini…" style="min-height:120px"></textarea>
-        <div class="formActions" style="margin-top:10px"><button class="btn" id="waRead" type="button">Baca Chat &amp; Isi Form</button><button class="btn secondary" id="waClear" type="button">Kosongkan</button></div>
+        <div class="hint" style="margin:8px 0">Di WhatsApp: buka chat konsumen → ⋮ → Lainnya → <b>Ekspor chat</b> → <b>Tanpa media</b> → simpan ke HP. Lalu pilih file itu di sini (format .txt atau .zip). Atau tempel teks chat di kotak bawah.</div>
+        <input type="file" id="waFile" accept=".txt,.zip,text/plain,application/zip,application/x-zip-compressed" style="display:none">
+        <div class="formActions" style="margin-bottom:10px"><button class="btn" id="waFileBtn" type="button">📎 Pilih File Ekspor Chat</button></div>
+        <textarea id="waPaste" placeholder="…atau tempel percakapan WhatsApp di sini" style="min-height:100px"></textarea>
+        <div class="formActions" style="margin-top:10px"><button class="btn secondary" id="waRead" type="button">Baca Teks yang Ditempel</button><button class="btn secondary" id="waClear" type="button">Kosongkan</button></div>
         <div class="hint" id="waResult" style="margin-top:8px"></div>
       </details>
       <form id="leadForm" novalidate>
@@ -381,7 +383,7 @@ main{--pad:13px}
           <div><label for="nama">Nama Lengkap <i>*</i></label><input id="nama" required placeholder="Masukkan nama calon pembeli" autocomplete="off"></div>
           <div><label for="wa">No. WhatsApp</label><input id="wa" inputmode="tel" placeholder="08xxxxxxxxxx"></div>
           <div><label for="tanggal">Tanggal Masuk</label><input id="tanggal" type="date"></div>
-          <div><label for="sumber">Sumber Prospek</label><select id="sumber"><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Showroom</option><option>Lainnya</option></select></div>
+          <div><label for="sumber">Sumber Prospek</label><select id="sumber"><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>Showroom</option><option>Canvasing</option><option>Flyering</option><option>Website</option><option>Event</option><option>Referensi</option><option>Lainnya</option></select></div>
           <div class="full"><label>Unit yang Diminati</label><input type="hidden" id="motor"><button type="button" class="pickBtn" id="motorBtn"></button>
             <div class="unitPrev" id="unitPrev" style="display:none"><img id="unitPrevImg" alt=""><div><b id="unitPrevName"></b><span id="unitPrevOtr"></span></div></div></div>
           <div class="full"><label>Warna Pilihan</label><input type="hidden" id="warna"><div class="sw" id="warnaSw"></div></div>
@@ -558,7 +560,7 @@ const pad=n=>String(n).padStart(2,'0');
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 const BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const AVC=['#2875e8','#15945b','#ee9b12','#8b4ce0','#e51e2a','#0e9aa7'];
-const SRC=['WhatsApp','Facebook','TikTok','Showroom','Lainnya'];
+const SRC=['WhatsApp','Facebook','TikTok','Instagram','Showroom','Canvasing','Flyering','Website','Event','Referensi','Lainnya'];
 const CATS=['Matic','Sport','Cub','EV','Big Bike'];
 const titles={dashboard:['Halo, Admin 👋','Semangat terus, semakin banyak yang beli, semakin maju!'],prospek:['Data Prospek','Cari, ubah, dan hubungi calon pembeli'],tambah:['Tambah Prospek','Catat calon pembeli, unit, dan rencana pembelian'],follow:['Follow Up','Prospek yang perlu dihubungi hari ini'],katalog:['Katalog Unit','60 unit dan varian Honda SPS'],kalkulator:['Kalkulator','Simulasi kredit dan cash untuk pelanggan'],laporan:['Laporan','Ringkasan performa prospek dan penjualan'],pengaturan:['Pengaturan','Cadangan data dan tampilan']};
 const cols=['id','tanggal','nama','wa','sumber','motor','warna','bayar','dp','tenor','angsuran','harga','tglBeli','status','next','sales','catatan','updatedAt'];
@@ -1091,7 +1093,32 @@ function waDays(txt,base){
   if(last){let diff=(idx[last]-d.getDay()+7)%7;if(diff===0)diff=7;return fmt(out(diff))}
   return '';
 }
-function waParse(raw,meNama){
+function waFileContact(fn){
+  const n=String(fn||'').replace(/\.(txt|zip)$/i,'').replace(/\s*\(\d+\)\s*$/,'').trim();
+  const m=n.match(/^(?:whatsapp chat (?:with|-)|chat whatsapp (?:dengan|-)|obrolan whatsapp (?:dengan|-))\s+(.+)$/i);
+  return m?m[1].trim():'';
+}
+async function waUnzipTxt(buf){
+  const dv=new DataView(buf),u8=new Uint8Array(buf);let e=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-65557);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}
+  if(e<0)throw new Error('zip');
+  const cnt=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const td=new TextDecoder();let best=null;
+  for(let k=0;k<cnt;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    const name=td.decode(u8.subarray(p+46,p+46+nl));
+    if(/\.txt$/i.test(name)&&!best)best={method,csize,off,name};
+    p+=46+nl+el+cl;
+  }
+  if(!best)throw new Error('notxt');
+  const lnl=dv.getUint16(best.off+26,true),lel=dv.getUint16(best.off+28,true),st=best.off+30+lnl+lel;
+  const data=u8.subarray(st,st+best.csize);
+  if(best.method===0)return td.decode(data);
+  if(best.method!==8)throw new Error('method');
+  const out=await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
+  return td.decode(out);
+}
+function waParse(raw,meNama,fileName){
   const text=String(raw||'').replace(/\u200e|\u202f/g,' ');
   const lines=text.split(/\r?\n/);
   const hdr=/^\s*\[?(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})[,\s]+(?:pukul\s+)?(\d{1,2}[.:]\d{2})(?:[.:]\d{2})?\s*(?:[ap]\.?m\.?)?\]?\s*(?:-\s*)?([^:]{1,60}?):\s?(.*)$/i;
@@ -1104,16 +1131,26 @@ function waParse(raw,meNama){
     if(from!==undefined){msgs.push({from,body:body||''})}
     else if(msgs.length&&l.trim())msgs[msgs.length-1].body+='\n'+l;
   });
+  if(!msgs.length){
+    const sp=/^\s*([^:\n\d][^:\n]{1,30}?):\s+(.+)$/,tmp=[];
+    lines.forEach(l=>{const m=l.match(sp);if(m&&!/^(dp|tenor|harga|nama|no|wa|unit|warna|angsuran|cicilan|budget|motor|alamat|catatan)$/i.test(m[1].trim()))tmp.push({from:m[1].trim(),body:m[2]});else if(tmp.length&&l.trim())tmp[tmp.length-1].body+='\n'+l});
+    const sps=[...new Set(tmp.map(m=>m.from))];
+    if(tmp.length>=3&&sps.length>=2&&sps.length<=3)tmp.forEach(m=>msgs.push(m));
+  }
+  const fc=waFileContact(fileName);
   const meL=String(meNama||'').toLowerCase().split(/\s+/)[0];
   const senders=[...new Set(msgs.map(m=>m.from))];
   const isMe=s=>{const x=s.toLowerCase();return /^(anda|you|saya|aku)$/.test(x)||(meL&&x.includes(meL))||/sps|honda|sales|dealer/.test(x)};
   const cust=senders.filter(s=>!isMe(s));
-  const custName=cust[0]||'';
+  let custName='';
+  if(fc){const f=fc.toLowerCase();custName=senders.find(s=>{const x=s.toLowerCase();return x.includes(f)||f.includes(x)})||''}
+  if(!custName)custName=cust[0]||'';
   const custMsgs=msgs.filter(m=>m.from===custName).map(m=>m.body.trim()).filter(Boolean);
   const all=msgs.length?msgs.map(m=>m.body).join('\n'):text;
   const custText=msgs.length?(custMsgs.join('\n')||all):text;
   let wa='',nama='';
   if(custName){if(waPhone(custName))wa=waPhone(custName);else if(!/^\+?[\d\s\-]+$/.test(custName))nama=custName}
+  if(fc){if(waPhone(fc)){if(!wa)wa=waPhone(fc)}else if(!nama)nama=fc}
   if(!wa)wa=waPhone(custText)||waPhone(all);
   if(!nama){
     const m=custText.match(/(?:nama (?:saya|aku|lengkap)?\s*(?:adalah|:)?|atas nama|perkenalkan,? (?:saya)?|saya)\s+([A-Za-z]+(?:\s+[A-Za-z]+){0,2})/i);
@@ -1144,14 +1181,30 @@ function waParse(raw,meNama){
   if(angs)bits.push('angsuran maks '+rp(angs));
   const last=custMsgs.slice(-2).map(s=>s.replace(/\s+/g,' ').slice(0,110));
   const note='Ringkasan chat WA: '+(bits.length?bits.join(', ')+'. ':'belum ada detail unit. ')+(last.length?'Pesan terakhir konsumen: "'+last.join(' / ')+'"':'');
-  return {nama,wa,unitIdx:ui,bayar,dp,tenor,warna,status,next,note,found:msgs.length>0};
+  return {sample:(lines.find(l=>l.trim())||'').trim().slice(0,70),fileContact:fc,nama,wa,unitIdx:ui,bayar,dp,tenor,warna,status,next,note,found:msgs.length>0};
 }
 
-$('waClear').onclick=()=>{$('waPaste').value='';$('waResult').innerHTML=''};
+window.waFileName='';
+$('waPaste').addEventListener('input',()=>{window.waFileName=''});
+$('waClear').onclick=()=>{$('waPaste').value='';$('waResult').innerHTML='';window.waFileName=''};
+$('waFileBtn').onclick=()=>$('waFile').click();
+$('waFile').onchange=async e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  try{
+    let txt;
+    if(/\.zip$/i.test(f.name)){
+      if(typeof DecompressionStream==='undefined'){alert('Browser ini belum bisa membuka .zip. Ekspor ulang pilih "Tanpa media" agar jadi file .txt.');return}
+      txt=await waUnzipTxt(await f.arrayBuffer());
+    }else txt=await f.text();
+    $('waPaste').value=txt;window.waFileName=f.name;
+    $('waRead').click();
+  }catch(err){alert('File tidak bisa dibaca. Ekspor ulang chat dengan pilihan "Tanpa media", lalu pilih file .txt.')}
+  e.target.value='';
+};
 $('waRead').onclick=()=>{
   const raw=$('waPaste').value.trim();
-  if(!raw){toast('Tempel chat WhatsApp dulu');return}
-  const r=waParse(raw,me&&me.nama);
+  if(!raw){toast('Pilih file atau tempel chat dulu');return}
+  const r=waParse(raw,me&&me.nama,window.waFileName);
   if(!$('editId').value)clearForm();
   const got=[],miss=[];
   if(r.nama){$('nama').value=r.nama;got.push('nama')}else miss.push('nama');
@@ -1170,7 +1223,8 @@ $('waRead').onclick=()=>{
   $('catatan').value=old&&old!==r.note?old+'\n'+r.note:r.note;
   const dup=r.wa?leads.find(x=>x.wa&&digits(x.wa)===digits(r.wa)&&x.id!==$('editId').value):null;
   let msg='✅ Terisi: '+esc(got.join(', ')||'-')+'.'+(miss.length?'<br>❓ Belum ketemu: '+esc(miss.join(', '))+' (isi manual).':'');
-  if(!r.found)msg+='<br><small>Format chat tidak dikenali, jadi nama diambil dari kalimat. Periksa lagi.</small>';
+  if(!r.wa)msg+='<br><small>Catatan: kalau konsumen tersimpan di kontak HP, WhatsApp hanya menulis namanya di ekspor chat, bukan nomornya. Nomor baru terbaca kalau konsumen belum tersimpan atau menyebutkannya di chat.</small>';
+  if(!r.found)msg+='<br><small>Format chat belum dikenali. Baris pertama yang terbaca: <i>'+esc(r.sample||'-')+'</i></small>';
   if(dup)msg+='<br>⚠️ Nomor ini sudah ada di prospek atas nama <b>'+esc(dup.nama)+'</b>. Cek dulu supaya tidak dobel.';
   msg+='<br>Periksa isian di bawah, lalu tekan <b>Simpan Prospek</b>.';
   $('waResult').innerHTML=msg;

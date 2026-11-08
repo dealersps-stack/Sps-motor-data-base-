@@ -232,6 +232,29 @@ main{--pad:13px}
 .rl .uthumb{display:none}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+/* impor dokumen */
+.impDrop{display:grid;justify-items:center;gap:6px;text-align:center;padding:26px 14px;border:2px dashed #cbd5e1;border-radius:14px;background:#fafbfd;cursor:pointer;color:var(--ink)}
+.impDrop .ic{width:30px;height:30px;color:var(--red)}.impDrop small{color:var(--muted);font-size:12px}
+.impDrop:hover,.impDrop.over,.impDrop:focus-visible{border-color:var(--red);background:#fff5f6}
+.impBody{display:none;gap:14px;margin-top:14px}
+.impErr{color:#c0172a}
+.impDet summary{cursor:pointer;font-weight:650;font-size:13.5px;min-height:44px;display:flex;align-items:center;color:var(--blue)}
+.impDet .impMap{margin-top:6px}
+.impMap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+.impMapRow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.impMapRow b{display:block;font-size:13px;overflow-wrap:anywhere}
+.impMapRow small{display:block;color:var(--muted);font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.impMapRow select{min-height:40px;font-size:12.5px;padding:8px}
+.impList{display:grid;gap:8px;max-height:460px;overflow-y:auto;margin-top:12px;-webkit-overflow-scrolling:touch}
+.impRow{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;cursor:pointer}
+.impRow.off{background:#f6f8fb;opacity:.75}
+.impRow input,.impOpt input{width:20px;height:20px;min-height:0;padding:0;margin:0}
+.impTx b{display:block;font-size:13.5px}.impTx small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px;overflow-wrap:anywhere}
+.impFlag{display:inline-block;font-style:normal;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px;margin:4px 4px 0 0}
+.impFlag.dup{background:#fff1d6;color:#a96a00}.impFlag.warn{background:#eef1f6;color:#5b6b82}.impFlag.bad{background:#fde5e7;color:#c0172a}
+.impOpt{display:flex;gap:10px;align-items:center;align-self:end}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:650px){.impMap{grid-template-columns:1fr}}
 </style>
 </head>
 <body data-page="dashboard">
@@ -253,6 +276,7 @@ main{--pad:13px}
 <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h1M12 12h1M16 12h0M8 16h1M12 16h1M16 16h0"/></symbol>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
 <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V5M7 9l5-5 5 5M5 20h14"/></symbol>
 </svg>
 
 <div class="layout">
@@ -267,6 +291,7 @@ main{--pad:13px}
     <button data-view="dashboard" class="active"><svg class="ic"><use href="#i-home"/></svg>Dashboard</button>
     <button data-view="prospek"><svg class="ic"><use href="#i-users"/></svg>Data Prospek</button>
     <button data-view="tambah"><svg class="ic"><use href="#i-plus"/></svg>Tambah Prospek</button>
+    <button data-view="impor"><svg class="ic"><use href="#i-upload"/></svg>Impor Dokumen</button>
     <button data-view="follow"><svg class="ic"><use href="#i-clock"/></svg>Follow Up<span class="badge" id="followBadge"></span></button>
     <button data-view="katalog"><svg class="ic"><use href="#i-grid"/></svg>Katalog Unit</button>
     <button data-view="kalkulator"><svg class="ic"><use href="#i-calc"/></svg>Kalkulator</button>
@@ -355,8 +380,9 @@ main{--pad:13px}
       <div class="toolbar">
         <div class="searchBox"><svg class="ic"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Cari nama, HP, atau motor" aria-label="Cari prospek"></div>
         <select id="filterStatus" aria-label="Filter status"><option value="">Semua Status</option><option>Baru</option><option>Follow-up</option><option>Tertarik</option><option>Closing</option><option>Gagal</option></select>
-        <select id="filterSource" aria-label="Filter sumber"><option value="">Semua Sumber</option><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>Showroom</option><option>Canvasing</option><option>Flyering</option><option>Website</option><option>Event</option><option>Referensi</option><option>Lainnya</option></select>
+        <select id="filterSource" aria-label="Filter sumber"><option value="">Semua Sumber</option><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>Showroom</option><option>Canvasing</option><option>Flyering</option><option>Website</option><option>Event</option><option>Referensi</option><option>Konsumen Lama</option><option>Lainnya</option></select>
         <select id="filterBayar" aria-label="Filter pembelian"><option value="">Cash &amp; Kredit</option><option>Cash</option><option>Kredit</option><option value="-">Belum ditentukan</option></select>
+        <button class="btn secondary" id="impOpen" type="button"><svg class="ic"><use href="#i-upload"/></svg>Impor Dokumen</button>
         <button class="btn secondary" id="exportBtn" type="button"><svg class="ic"><use href="#i-down"/></svg>Ekspor CSV</button>
       </div>
       <div class="tableWrap"><table class="rt"><thead><tr><th>Nama</th><th>Unit</th><th>Pembelian</th><th>Status</th><th>Tgl Beli</th><th>Follow Up</th><th>Aksi</th></tr></thead><tbody id="allRows"></tbody></table></div>
@@ -383,7 +409,7 @@ main{--pad:13px}
           <div><label for="nama">Nama Lengkap <i>*</i></label><input id="nama" required placeholder="Masukkan nama calon pembeli" autocomplete="off"></div>
           <div><label for="wa">No. WhatsApp</label><input id="wa" inputmode="tel" placeholder="08xxxxxxxxxx"></div>
           <div><label for="tanggal">Tanggal Masuk</label><input id="tanggal" type="date"></div>
-          <div><label for="sumber">Sumber Prospek</label><select id="sumber"><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>Showroom</option><option>Canvasing</option><option>Flyering</option><option>Website</option><option>Event</option><option>Referensi</option><option>Lainnya</option></select></div>
+          <div><label for="sumber">Sumber Prospek</label><select id="sumber"><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>Showroom</option><option>Canvasing</option><option>Flyering</option><option>Website</option><option>Event</option><option>Referensi</option><option>Konsumen Lama</option><option>Lainnya</option></select></div>
           <div class="full"><label>Unit yang Diminati</label><input type="hidden" id="motor"><button type="button" class="pickBtn" id="motorBtn"></button>
             <div class="unitPrev" id="unitPrev" style="display:none"><img id="unitPrevImg" alt=""><div><b id="unitPrevName"></b><span id="unitPrevOtr"></span></div></div></div>
           <div class="full"><label>Warna Pilihan</label><input type="hidden" id="warna"><div class="sw" id="warnaSw"></div></div>
@@ -400,6 +426,36 @@ main{--pad:13px}
         </div>
         <div class="formActions"><button class="btn" id="saveBtn" type="submit">Simpan Prospek</button><button class="btn secondary" id="resetBtn" type="button">Reset</button></div>
       </form>
+    </div>
+  </section>
+
+    <section class="view" id="view-impor">
+    <div class="panel">
+      <h3 style="margin-bottom:6px">Unggah dokumen</h3>
+      <p class="hint" style="margin:0 0 12px">Pilih file Excel (.xlsx) atau CSV berisi daftar konsumen. Judul kolom (nama, no HP, alamat, penawaran, pesan WA, dst) dikenali otomatis dan bisa kamu ubah sebelum diimpor. File dibaca langsung di perangkatmu.</p>
+      <input type="file" id="impFile" accept=".xlsx,.xlsm,.xls,.csv,.tsv,.txt,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display:none">
+      <div class="impDrop" id="impDrop" role="button" tabindex="0"><svg class="ic"><use href="#i-upload"/></svg><b>Pilih file atau seret ke sini</b><small>.xlsx · .csv</small></div>
+      <div class="hint" id="impMsg" style="margin-top:10px"></div>
+    </div>
+    <div class="impBody" id="impBody">
+      <div class="panel">
+        <div class="panelHead"><h3>Cocokkan kolom</h3><span class="muted" id="impFileName"></span></div>
+        <div id="impSheetWrap" style="margin-bottom:12px"><label for="impSheet">Lembar (sheet)</label><select id="impSheet"></select></div>
+        <div class="hint" id="impFound" style="margin:0 0 10px"></div>
+        <details class="impDet" id="impDet"><summary>Lihat / ubah pencocokan kolom</summary><div class="impMap" id="impMap"></div></details>
+      </div>
+      <div class="panel">
+        <div class="panelHead"><h3>Pratinjau</h3><button class="link" id="impAll" type="button">Pilih / kosongkan semua</button></div>
+        <div class="formGrid">
+          <div><label for="impSumber">Sumber prospek</label><select id="impSumber"></select></div>
+          <div class="impOpt"><input type="checkbox" id="impSched" checked><label for="impSched" style="margin:0">Jadwalkan follow up hari ini untuk yang belum dihubungi</label></div>
+        </div>
+        <div class="hint" id="impWarn" style="color:#c0172a"></div>
+        <div class="hint" id="impSum" style="margin-top:12px"></div>
+        <div class="impList" id="impList"></div>
+        <div class="hint" id="impMore"></div>
+        <div class="formActions"><button class="btn" id="impGo" type="button">Impor 0 Prospek</button><button class="btn secondary" id="impReset" type="button">Batal</button></div>
+      </div>
     </div>
   </section>
 
@@ -560,9 +616,9 @@ const pad=n=>String(n).padStart(2,'0');
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 const BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const AVC=['#2875e8','#15945b','#ee9b12','#8b4ce0','#e51e2a','#0e9aa7'];
-const SRC=['WhatsApp','Facebook','TikTok','Instagram','Showroom','Canvasing','Flyering','Website','Event','Referensi','Lainnya'];
+const SRC=['WhatsApp','Facebook','TikTok','Instagram','Showroom','Canvasing','Flyering','Website','Event','Referensi','Konsumen Lama','Lainnya'];
 const CATS=['Matic','Sport','Cub','EV','Big Bike'];
-const titles={dashboard:['Halo, Admin 👋','Semangat terus, semakin banyak yang beli, semakin maju!'],prospek:['Data Prospek','Cari, ubah, dan hubungi calon pembeli'],tambah:['Tambah Prospek','Catat calon pembeli, unit, dan rencana pembelian'],follow:['Follow Up','Prospek yang perlu dihubungi hari ini'],katalog:['Katalog Unit','60 unit dan varian Honda SPS'],kalkulator:['Kalkulator','Simulasi kredit dan cash untuk pelanggan'],laporan:['Laporan','Ringkasan performa prospek dan penjualan'],pengaturan:['Pengaturan','Cadangan data dan tampilan']};
+const titles={dashboard:['Halo, Admin 👋','Semangat terus, semakin banyak yang beli, semakin maju!'],prospek:['Data Prospek','Cari, ubah, dan hubungi calon pembeli'],tambah:['Tambah Prospek','Catat calon pembeli, unit, dan rencana pembelian'],impor:['Impor Dokumen','Unggah Excel atau CSV, isinya jadi prospek'],follow:['Follow Up','Prospek yang perlu dihubungi hari ini'],katalog:['Katalog Unit','60 unit dan varian Honda SPS'],kalkulator:['Kalkulator','Simulasi kredit dan cash untuk pelanggan'],laporan:['Laporan','Ringkasan performa prospek dan penjualan'],pengaturan:['Pengaturan','Cadangan data dan tampilan']};
 const cols=['id','tanggal','nama','wa','sumber','motor','warna','bayar','dp','tenor','angsuran','harga','tglBeli','status','next','sales','catatan','updatedAt'];
 
 /* ---------- util ---------- */
@@ -600,10 +656,11 @@ function quoteText(u,warna,q,nama){
 function leadQuote(x){const i=ufind(x.motor);if(i<0||!x.bayar)return null;return{u:UNITS[i],q:quote(UNITS[i],{bayar:x.bayar,dp:x.dp,tenor:x.tenor,diskon:0})}}
 
 /* ---------- potongan tampilan ---------- */
+function roMsg(x){const m=/^Pesan WA:\s*(.+)$/m.exec(x.catatan||'');return m?m[1].replace(/\s*¶\s*/g,'\n').trim():''}
 function waBtn(x){
   const n=waNum(x.wa);if(!n)return'';
   const lq=leadQuote(x);
-  const text=lq?quoteText(lq.u,x.warna,lq.q,x.nama):`Halo ${x.nama}, saya dari SPS Motor Sleman. Ada yang bisa kami bantu soal motor Honda impian Anda?`;
+  const text=roMsg(x)||(lq?quoteText(lq.u,x.warna,lq.q,x.nama):`Halo ${x.nama}, saya dari SPS Motor Sleman. Ada yang bisa kami bantu soal motor Honda impian Anda?`);
   return `<a class="chip" href="https://wa.me/${n}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener" aria-label="Chat WhatsApp">WA</a>`;
 }
 function who(x){const pemilik=(me&&me.peran==='koordinator'&&x.owner&&profMap[x.owner])?'Sales: '+profMap[x.owner]:'';return `<div class="who">${av(x.nama)}<div><b>${esc(x.nama)}</b><small>${esc([x.wa,x.sumber,pemilik].filter(Boolean).join(' · '))}</small></div></div>`}
@@ -1229,6 +1286,306 @@ $('waRead').onclick=()=>{
   msg+='<br>Periksa isian di bawah, lalu tekan <b>Simpan Prospek</b>.';
   $('waResult').innerHTML=msg;
   $('leadForm').scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+/* ---------- impor dokumen (Excel / CSV) ---------- */
+const IMP={sheets:[],si:0,cols:[],data:[],map:[],items:[],name:''};
+const IMP_T=[['skip','Abaikan'],['nama','Nama'],['wa','No HP / WhatsApp'],['wa2','No cadangan (kalau HP kosong)'],['alamat','Alamat (digabung)'],['motor','Unit incaran'],['penawaran','Penawaran / unit saran'],['status','Status'],['hasil','Hasil kontak'],['next','Jadwal follow up'],['pesan','Pesan WA siap kirim'],['sales','Nama sales'],['catatan','Masuk ke Catatan']];
+const MON={jan:1,januari:1,feb:2,februari:2,mar:3,maret:3,apr:4,april:4,mei:5,may:5,jun:6,juni:6,jul:7,juli:7,agu:8,agt:8,agustus:8,aug:8,sep:9,sept:9,september:9,okt:10,oktober:10,oct:10,nov:11,november:11,des:12,desember:12,dec:12};
+function ymd(y,m,d){if(m<1||m>12||d<1||d>31)return'';const dt=new Date(Date.UTC(y,m-1,d));return dt.getUTCMonth()===m-1?y+'-'+pad(m)+'-'+pad(d):''}
+function impDate(v){
+  v=String(v||'').trim();let m;
+  if(m=/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ].*)?$/.exec(v))return ymd(+m[1],+m[2],+m[3]);
+  if(m=/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/.exec(v)){let y=+m[3];if(y<100)y+=2000;return ymd(y,+m[2],+m[1])}
+  if(m=/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{2,4})$/.exec(v)){const mo=MON[m[2].toLowerCase()];if(mo){let y=+m[3];if(y<100)y+=2000;return ymd(y,mo,+m[1])}}
+  return'';
+}
+function impDisp(v){const d=impDate(v);return d?fmtDate(d):v}
+function impPhone(v){let d=digits(v);if(!d)return'';if(d.startsWith('62'))d='0'+d.slice(2);else if(d.startsWith('8'))d='0'+d;return d}
+function impPhones(v){return String(v||'').split(/[\/,;\n]| atau | dan /i).map(impPhone).filter(Boolean)}
+function impStatus(v){
+  const s=String(v||'').toLowerCase().trim();if(!s)return'';
+  const ex={'baru':'Baru','follow-up':'Follow-up','follow up':'Follow-up','followup':'Follow-up','tertarik':'Tertarik','closing':'Closing','gagal':'Gagal'};
+  if(ex[s])return ex[s];
+  if(/closing|deal|sudah beli|jadi beli|akad|spk/.test(s))return'Closing';
+  if(/tidak (minat|mau|berminat|jadi|butuh)|belum (minat|mau)|menolak|batal|gagal|salah nomor|nomor (salah|tidak aktif)|tidak aktif/.test(s))return'Gagal';
+  if(/tertarik|berminat|minat|janji|akan datang|datang|setuju|mau/.test(s))return'Tertarik';
+  if(/follow|nanti|hubungi|belum (angkat|balas|respon|dibalas|dijawab)|tidak (angkat|dibalas|diangkat)|sibuk|belum butuh|pikir/.test(s))return'Follow-up';
+  return'';
+}
+function impGuess(h){
+  const s=String(h||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  if(!s)return'skip';
+  if(/^(no|nomor|urut|no urut|id)$/.test(s))return'skip';
+  if(/^(link|tautan|url)( |$)/.test(s))return'skip';
+  if(/(^| )pesan( |$)|script|isi chat/.test(s))return'pesan';
+  if(/^(nama|nama lengkap|nama konsumen|nama customer|nama pelanggan|nama prospek|nama calon pembeli|konsumen|customer|pelanggan|prospek)$/.test(s))return'nama';
+  if(/^(telp|tlp|telepon|phone)$/.test(s))return'wa2';
+  if(/(^| )(hp|wa|whatsapp|handphone|ponsel|no telp|no telepon|nomor telepon)( |$)/.test(s))return'wa';
+  if(/penawaran|rekomendasi|saran|tawaran|unit tujuan/.test(s))return'penawaran';
+  if(/^(alamat|kelurahan|kecamatan|kab kota|kabupaten|kota|desa|domisili|kab)$/.test(s))return'alamat';
+  if(/^(unit|motor|produk|unit minat|motor minat|unit incaran|minat|unit yang diminati)$/.test(s))return'motor';
+  if(/^hasil( kontak| follow up| fu)?$/.test(s))return'hasil';
+  if(/tindak lanjut|jadwal|follow up|next|^fu$/.test(s))return'next';
+  if(/^status$/.test(s))return'status';
+  if(/^(sales|salesman|petugas|pic|nama sales)$/.test(s))return'sales';
+  return'catatan';
+}
+function impFindHeader(rows){
+  let best=-1,bs=0;
+  for(let i=0;i<Math.min(rows.length,25);i++){
+    const r=rows[i]||[],g=r.map(impGuess);
+    if(!g.includes('nama'))continue;
+    let sc=5;if(g.includes('wa')||g.includes('wa2'))sc+=3;
+    sc+=Math.min(r.filter(c=>String(c==null?'':c).trim()).length,8)*.2;
+    if(sc>bs){bs=sc;best=i}
+  }
+  return best;
+}
+
+/* --- pembaca .xlsx (zip + XML), tanpa pustaka tambahan --- */
+function colIdx(s){let n=0;for(const ch of s)n=n*26+ch.charCodeAt(0)-64;return n-1}
+function isDateFmt(id,code){
+  id=+id;
+  if((id>=14&&id<=22)||(id>=27&&id<=36)||(id>=45&&id<=47)||(id>=50&&id<=58))return true;
+  if(!code)return false;
+  const c=code.replace(/"[^"]*"/g,'').replace(/\[[^\]]*\]/g,m=>/^\[(h+|m+|s+)\]$/i.test(m)?'h':'').replace(/\\./g,'').replace(/_./g,'').replace(/\*./g,'');
+  return /[dmyhs]/i.test(c);
+}
+function xlDate(n,s1904){
+  if(n<1){const m=Math.round(n*1440);return pad(Math.floor(m/60)%24)+':'+pad(m%60)}
+  const d=new Date((s1904?Date.UTC(1904,0,1):Date.UTC(1899,11,30))+Math.floor(n)*86400000);
+  return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());
+}
+async function xzFiles(buf){
+  const u8=new Uint8Array(buf),dv=new DataView(buf);let e=u8.length-22;
+  while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;
+  if(e<0)throw new Error('zip');
+  const cnt=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const td=new TextDecoder(),files={};
+  for(let k=0;k<cnt;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    files[td.decode(u8.subarray(p+46,p+46+nl))]={method,csize,off};
+    p+=46+nl+el+cl;
+  }
+  return async n=>{
+    const f=files[n];if(!f)return null;
+    const lnl=dv.getUint16(f.off+26,true),lel=dv.getUint16(f.off+28,true),st=f.off+30+lnl+lel,d=u8.subarray(st,st+f.csize);
+    if(f.method===0)return td.decode(d);
+    if(f.method!==8)throw new Error('zip');
+    return td.decode(await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+  };
+}
+async function xlsxRead(buf){
+  if(typeof DecompressionStream==='undefined')throw new Error('nodecomp');
+  const get=await xzFiles(buf),dp=new DOMParser();
+  const X=async n=>{const s=await get(n);return s==null?null:dp.parseFromString(s,'application/xml')};
+  const all=(el,tag)=>Array.from(el.getElementsByTagNameNS('*',tag));
+  const wb=await X('xl/workbook.xml');if(!wb)throw new Error('zip');
+  const s1904=all(wb,'workbookPr').some(e=>/^(1|true)$/.test(e.getAttribute('date1904')||''));
+  const rels=await X('xl/_rels/workbook.xml.rels'),relMap={};
+  if(rels)all(rels,'Relationship').forEach(r=>relMap[r.getAttribute('Id')]=r.getAttribute('Target'));
+  const ss=[],sx=await X('xl/sharedStrings.xml');
+  if(sx)all(sx,'si').forEach(si=>ss.push(all(si,'t').filter(t=>t.parentNode.localName!=='rPh').map(t=>t.textContent).join('')));
+  const st=await X('xl/styles.xml'),dateXf=[];
+  if(st){
+    const fm={};all(st,'numFmt').forEach(n=>fm[n.getAttribute('numFmtId')]=n.getAttribute('formatCode')||'');
+    const cx=all(st,'cellXfs')[0];
+    if(cx)Array.from(cx.children).forEach(xf=>{const id=xf.getAttribute('numFmtId')||'0';dateXf.push(isDateFmt(id,fm[id]))});
+  }
+  const out=[];
+  for(const sh of all(wb,'sheet')){
+    const rid=sh.getAttribute('r:id')||sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
+    let tg=relMap[rid];if(!tg)continue;
+    tg=tg.replace(/^\//,'');const sd=await X(tg.startsWith('xl/')?tg:'xl/'+tg);if(!sd)continue;
+    const rows=[];
+    all(sd,'row').forEach(rw=>{
+      const arr=[];
+      Array.from(rw.children).forEach(c=>{
+        if(c.localName!=='c')return;
+        const m=/^([A-Z]+)/.exec(c.getAttribute('r')||''),ci=m?colIdx(m[1]):arr.length;
+        const t=c.getAttribute('t'),s=+c.getAttribute('s')||0,ve=c.getElementsByTagNameNS('*','v')[0];
+        let v=ve?ve.textContent:'';
+        if(t==='s')v=ss[+v]==null?'':ss[+v];
+        else if(t==='inlineStr')v=all(c,'t').map(x=>x.textContent).join('');
+        else if(t==='b')v=v==='1'?'TRUE':'FALSE';
+        else if(t!=='str'&&t!=='e'&&v!==''&&!isNaN(+v))v=dateXf[s]?xlDate(+v,s1904):String(parseFloat((+v).toPrecision(15)));
+        arr[ci]=v;
+      });
+      const row=Array.from(arr,x=>x==null?'':x);
+      if(row.some(x=>String(x).trim()))rows.push(row);
+    });
+    out.push({name:sh.getAttribute('name')||'Sheet',rows});
+  }
+  if(!out.length)throw new Error('zip');
+  return out;
+}
+function csvParse(t){
+  t=t.replace(/^\uFEFF/,'');
+  const first=t.split(/\r?\n/,1)[0]||'';
+  const d=[[';',first.split(';').length],[',',first.split(',').length],['\t',first.split('\t').length]].sort((a,b)=>b[1]-a[1])[0][0];
+  const rows=[];let r=[],c='',q=false;
+  for(let i=0;i<t.length;i++){
+    const ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch==='"')q=true;
+    else if(ch===d){r.push(c);c=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';rows.push(r);r=[]}
+    else c+=ch;
+  }
+  if(c!==''||r.length){r.push(c);rows.push(r)}
+  return rows.filter(x=>x.some(v=>String(v).trim()));
+}
+
+/* --- cocokkan teks penawaran dengan katalog unit --- */
+let _ukeys=null;
+function ukeys(){
+  if(_ukeys)return _ukeys;const m=new Map();
+  UNITS.forEach((u,i)=>{const w=u.n.toLowerCase().split(/\s+/);let k=w[0];if(w[1]&&(/^\d+[a-z]?$/.test(w[1])||w[1]==='street'))k+=' '+w[1];if(!m.has(k))m.set(k,i)});
+  return _ukeys=[...m.entries()].map(([k,i])=>[k,i,new RegExp('(^|[^a-z0-9])('+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/ /g,'\\s*')+')(?![a-z0-9])')]);
+}
+function unitFromText(t){
+  t=String(t||'').toLowerCase();if(!t)return-1;
+  const mk=/(^|\s)ke\s+/.exec(t),seg=mk?t.slice(mk.index+mk[0].length):t;
+  for(const s of[seg,t]){
+    let best=null;
+    for(const[k,i,re]of ukeys()){const m=re.exec(s);if(m){const p=m.index+m[1].length;if(!best||p<best.p||(p===best.p&&k.length>best.k.length))best={p,i,k}}}
+    if(best)return best.i;
+  }
+  return-1;
+}
+
+/* --- ubah baris dokumen jadi calon prospek --- */
+function impBuild(){
+  const t=today(),sched=$('impSched').checked,meN=(me&&me.nama)||'';
+  const ex=new Map();leads.forEach(x=>{const k=waNum(x.wa);if(k&&!ex.has(k))ex.set(k,x)});
+  const seen=new Set();
+  IMP.items=IMP.data.map(r=>{
+    const g={},cat=[],adr=[],extra=[],flags=[];let hasil='';
+    IMP.map.forEach((tg,ci)=>{
+      const raw=r[ci]==null?'':String(r[ci]).trim();
+      if(!raw||tg==='skip')return;
+      if(tg==='nama'){if(!g.nama)g.nama=raw}
+      else if(tg==='wa'||tg==='wa2'){(g[tg]=g[tg]||[]).push(...impPhones(raw))}
+      else if(tg==='alamat'){if(!adr.some(a=>a.toLowerCase()===raw.toLowerCase()))adr.push(raw)}
+      else if(tg==='motor'){if(!g.motor)g.motor=raw}
+      else if(tg==='penawaran'){if(!g.pen)g.pen=raw}
+      else if(tg==='status'){const s=impStatus(raw);if(s){if(!g.status)g.status=s}else cat.push('Status: '+raw)}
+      else if(tg==='hasil'){if(!hasil)hasil=raw}
+      else if(tg==='next'){const d=impDate(raw);if(d){if(!g.next)g.next=d}else extra.push('Tindak lanjut: '+raw)}
+      else if(tg==='pesan'){if(!g.pesan)g.pesan=raw}
+      else if(tg==='sales'){if(!g.sales)g.sales=raw}
+      else cat.push((IMP.cols[ci]||'Kolom '+(ci+1))+': '+impDisp(raw));
+    });
+    const phones=[...(g.wa||[]),...(g.wa2||[])],good=phones.filter(p=>waNum(p));
+    const wa=good[0]||phones[0]||'',others=good.filter(p=>p!==wa).filter((p,i,a)=>a.indexOf(p)===i);
+    let ui=-1;
+    if(g.motor){ui=ufind(g.motor,true);if(ui<0)ui=unitFromText(g.motor)}
+    if(ui<0&&g.pen)ui=unitFromText(g.pen);
+    const status=g.status||(hasil?(impStatus(hasil)||'Follow-up'):'Baru');
+    let next=g.next||'';
+    if(!next&&sched&&!hasil&&(status==='Baru'||status==='Follow-up'))next=t;
+    const lines=[];
+    if(cat.length)lines.push(cat.join(' · '));
+    if(adr.length)lines.push('Alamat: '+adr.join(', '));
+    if(g.pen)lines.push('Penawaran: '+g.pen);
+    if(hasil)lines.push('Hasil kontak: '+hasil);
+    extra.forEach(e=>lines.push(e));
+    if(others.length)lines.push('No lain: '+others.join(', '));
+    if(g.pesan)lines.push('Pesan WA: '+g.pesan.replace(/\s*[\r\n]+\s*/g,' ¶ '));
+    const item={nama:g.nama||'',wa,tanggal:t,sumber:'',motor:ui>=0?UNITS[ui].n:(g.motor||''),warna:'',bayar:'',dp:'',tenor:'',angsuran:'',harga:ui>=0?UNITS[ui].o:'',tglBeli:'',status,next,sales:g.sales||meN,catatan:lines.join('\n'),updatedAt:new Date().toISOString(),_dirty:true};
+    let ok=true,block=false;
+    if(!item.nama){flags.push(['bad','Nama kosong']);ok=false;block=true}
+    const k=waNum(wa);
+    if(!wa)flags.push(['warn','Tanpa nomor HP']);
+    else if(!k)flags.push(['warn','Nomor HP tidak valid']);
+    else{
+      if(ex.has(k)){flags.push(['dup','Sudah ada: '+ex.get(k).nama]);ok=false}
+      else if(seen.has(k)){flags.push(['dup','Nomor dobel di file']);ok=false}
+      seen.add(k);
+    }
+    return{item,flags,ok,block};
+  });
+}
+function impCount(){
+  const n=IMP.items.filter(x=>x.ok).length;
+  $('impGo').textContent='Impor '+n+' Prospek';$('impGo').disabled=!n||!IMP.map.includes('nama');
+  $('impSum').textContent=IMP.items.length+' baris data · '+n+' dipilih';
+}
+function impRenderMap(){
+  $('impMap').innerHTML=IMP.cols.map((c,i)=>{
+    const sm=IMP.data.map(r=>r[i]).find(v=>v!=null&&String(v).trim()!=='');
+    return `<div class="impMapRow"><div><b>${esc(c||'Kolom '+(i+1))}</b><small>${esc(sm==null?'(kosong)':String(impDisp(String(sm))).slice(0,60))}</small></div><select data-ci="${i}" aria-label="Isi kolom ${esc(c||i+1)} ke">${IMP_T.map(([v,l])=>`<option value="${v}"${IMP.map[i]===v?' selected':''}>${esc(l)}</option>`).join('')}</select></div>`;
+  }).join('');
+}
+function impRenderList(){
+  const warn=[];
+  if(!IMP.map.includes('nama'))warn.push('Pilih satu kolom sebagai <b>Nama</b> dulu.');
+  else if(!IMP.map.some(m=>m==='wa'||m==='wa2'))warn.push('Belum ada kolom nomor HP, jadi tombol WA tidak akan muncul.');
+  $('impWarn').innerHTML=warn.join('<br>');
+  $('impList').innerHTML=IMP.items.slice(0,500).map((x,i)=>`<label class="impRow${x.ok?'':' off'}"><input type="checkbox" data-i="${i}"${x.ok?' checked':''}${x.block?' disabled':''}><div class="impTx"><b>${esc(x.item.nama||'(tanpa nama)')}</b><small>${esc([x.item.wa,x.item.motor?uname(x.item.motor):''].filter(Boolean).join(' · ')||'tanpa nomor')}</small>${x.flags.map(f=>`<em class="impFlag ${f[0]}">${esc(f[1])}</em>`).join('')}</div>${pill(x.item.status)}</label>`).join('')||'<div class="empty">Tidak ada baris data di lembar ini.</div>';
+  $('impMore').textContent=IMP.items.length>500?'Daftar menampilkan 500 baris pertama. Baris sisanya ikut diimpor sesuai pilihan awal.':'';
+  impCount();
+}
+function impSetSheet(si){
+  IMP.si=si;const rows=IMP.sheets[si].rows;
+  let h=impFindHeader(rows);const found=h>=0;if(h<0)h=0;
+  let w=(rows[h]||[]).length;for(let i=h+1;i<rows.length;i++)if(rows[i].length>w)w=rows[i].length;
+  IMP.cols=Array.from({length:w},(_,i)=>String((rows[h]||[])[i]==null?'':rows[h][i]).trim());
+  IMP.data=rows.slice(h+1).map(r=>Array.from({length:w},(_,i)=>r[i]==null?'':r[i]));
+  IMP.map=IMP.cols.map(impGuess);
+  const got=[...new Set(IMP.map.filter(m=>m!=='skip'&&m!=='catatan'))].map(m=>(IMP_T.find(t=>t[0]===m)||[])[1]).filter(Boolean);
+  $('impFound').textContent=found?'Dikenali otomatis: '+got.join(', ')+'. Kolom lainnya masuk ke Catatan.':'Judul kolom tidak dikenali, baris pertama dipakai sebagai judul. Pilih kolom Nama dan No HP secara manual.';
+  $('impDet').open=!found||!IMP.map.includes('nama');
+  impRenderMap();impBuild();impRenderList();
+}
+async function impLoad(f){
+  const msg=$('impMsg');msg.className='hint';msg.textContent='Membaca '+f.name+'…';
+  try{
+    let sheets;
+    if(/\.(xlsx|xlsm)$/i.test(f.name))sheets=await xlsxRead(await f.arrayBuffer());
+    else if(/\.(csv|tsv|txt)$/i.test(f.name))sheets=[{name:'CSV',rows:csvParse(await f.text())}];
+    else if(/\.xls$/i.test(f.name)){msg.className='hint impErr';msg.innerHTML='Format <b>.xls</b> lama belum bisa dibaca. Buka di Excel, pilih <b>Simpan sebagai</b> → <b>Excel Workbook (.xlsx)</b> atau <b>CSV</b>, lalu unggah lagi.';return}
+    else{msg.className='hint impErr';msg.textContent='Jenis file belum didukung. Pakai .xlsx atau .csv.';return}
+    sheets=sheets.filter(s=>s.rows.length);
+    if(!sheets.length){msg.className='hint impErr';msg.textContent='File ini kosong.';return}
+    IMP.sheets=sheets;IMP.name=f.name;
+    let pick=sheets.findIndex(s=>impFindHeader(s.rows)>=0);if(pick<0)pick=0;
+    $('impSheet').innerHTML=sheets.map((s,i)=>`<option value="${i}">${esc(s.name)} (${s.rows.length} baris)</option>`).join('');
+    $('impSheet').value=String(pick);$('impSheetWrap').style.display=sheets.length>1?'block':'none';
+    $('impFileName').textContent=f.name;$('impBody').style.display='grid';msg.textContent='';
+    impSetSheet(pick);
+    $('impBody').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){
+    msg.className='hint impErr';
+    msg.textContent=err&&err.message==='nodecomp'?'Browser ini belum bisa membuka .xlsx. Simpan dokumennya sebagai CSV lalu unggah lagi.':'File tidak bisa dibaca. Pastikan .xlsx tidak diberi sandi, atau simpan sebagai CSV.';
+  }
+}
+function impReset(){IMP.sheets=[];IMP.items=[];IMP.data=[];$('impBody').style.display='none';$('impMsg').textContent='';$('impFile').value=''}
+$('impSumber').innerHTML=SRC.map(s=>`<option${s==='Konsumen Lama'?' selected':''}>${esc(s)}</option>`).join('');
+const impDz=$('impDrop');
+impDz.onclick=()=>$('impFile').click();
+impDz.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('impFile').click()}};
+['dragenter','dragover'].forEach(n=>impDz.addEventListener(n,e=>{e.preventDefault();impDz.classList.add('over')}));
+['dragleave','drop'].forEach(n=>impDz.addEventListener(n,e=>{e.preventDefault();impDz.classList.remove('over')}));
+impDz.addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files[0];if(f)impLoad(f)});
+$('impFile').onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)impLoad(f);e.target.value=''};
+$('impSheet').onchange=e=>impSetSheet(+e.target.value);
+$('impMap').addEventListener('change',e=>{const s=e.target.closest('select[data-ci]');if(!s)return;IMP.map[+s.dataset.ci]=s.value;impBuild();impRenderList()});
+$('impList').addEventListener('change',e=>{const c=e.target.closest('input[data-i]');if(!c)return;const x=IMP.items[+c.dataset.i];x.ok=c.checked;c.closest('.impRow').classList.toggle('off',!c.checked);impCount()});
+$('impSched').addEventListener('change',()=>{impBuild();impRenderList()});
+$('impAll').onclick=()=>{const c=IMP.items.filter(x=>!x.block),all=c.every(x=>x.ok);c.forEach(x=>x.ok=!all);impRenderList()};
+$('impReset').onclick=impReset;
+$('impOpen').onclick=()=>showView('impor');
+$('impGo').onclick=()=>{
+  const sel=IMP.items.filter(x=>x.ok&&x.item.nama);
+  if(!sel.length){toast('Belum ada baris yang dipilih');return}
+  const src=$('impSumber').value,ts=Date.now();
+  const add=sel.map((x,k)=>({...x.item,id:'SPS-'+(ts+k)+'-'+Math.random().toString(36).slice(2,6),sumber:src}));
+  leads=[...add,...leads];
+  impReset();persist();showView('prospek');
+  $('filterSource').value=src;$('search').value='';page=1;render();
+  toast(add.length+' prospek diimpor'+(navigator.onLine?'':', dikirim saat ada sinyal'));
 };
 
 /* ---------- mulai ---------- */
